@@ -1,5 +1,5 @@
 class ArticlesController < ApplicationController
-  before_action :article, only: [:show, :edit]
+  before_action :article, only: %I[show edit destroy]
   def index
     @articles = Article.all
   end
@@ -13,8 +13,8 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    @article = Article.new(create_params)
-    @article.save
+    @article = Article.create!(article_params)
+    # why need a bang?
 
     redirect_to article_path(@article)
   end
@@ -24,9 +24,16 @@ class ArticlesController < ApplicationController
   end
 
   def update
+    @article = Article.find(params[:id])
+    @article.update(article_params)
+
+    redirect_to article_path(@article)
   end
 
   def destroy
+    @article.destroy
+
+    redirect_to articles_path, status: :see_other
   end
 
   private
@@ -35,7 +42,7 @@ class ArticlesController < ApplicationController
     @article = Article.find(params[:id])
   end
 
-  def create_params
+  def article_params
     params.require(:article).permit(:title, :content)
   end
 end
